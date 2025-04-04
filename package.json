@@ -1,0 +1,80 @@
+{
+  "name": "video-transcriber",
+  "version": "1.0.0",
+  "description": "Transcribe and translate videos using OpenAI Whisper.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Electron",
+    "Whisper",
+    "Transcription",
+    "Translation"
+  ],
+  "author": "Your Name or Company",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "ffmpeg-static": "^5.0.0",
+    "openai": "^4.0.0",
+    "electron-store": "^8.1.0"
+  },
+  "build": {
+    "appId": "com.yourapp.videotranscriber",
+    "productName": "Video Transcriber",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "style.css",
+      "settings.html",
+      "settings-renderer.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+        {
+            "from": "node_modules/ffmpeg-static/", 
+            "to": "ffmpeg-static",
+            "filter": [
+                "**/*",
+                "!*.txt",
+                "!*.md"
+            ]
+        }
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "target": [
+        {
+          "target": "dir",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
+      "icon": "build/icon.icns",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "win": {
+        "target": "nsis",
+        "icon": "build/icon.ico"
+    },
+    "linux": {
+        "target": "AppImage",
+        "icon": "build/icon.png"
+    }
+  }
+} 

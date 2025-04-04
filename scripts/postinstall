@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Define the installation path (this is the default for pkgbuild)
+APP_PATH="/Applications/Video Transcriber.app"
+
+# Check if the application exists at the path
+if [ -d "$APP_PATH" ]; then
+    echo "Removing quarantine attribute from $APP_PATH"
+    # Remove the quarantine extended attribute
+    xattr -cr "$APP_PATH"
+    # Optional: Log success or failure
+    if [ $? -eq 0 ]; then
+        echo "Successfully removed quarantine attribute."
+    else
+        echo "Failed to remove quarantine attribute."
+    fi
+else
+    echo "Application not found at $APP_PATH. Skipping xattr command."
+fi
+
+exit 0 # Indicate successful script execution 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Video Transcriber</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Recommended Electron security Content-Security-Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' blob:;">
+</head>
+<body>
+  <div class="container">
+    <div class="video-section">
+      <div id="video-placeholder">
+        <p>Select a video file to load.</p>
+      </div>
+      <video id="video-player" controls style="display: none; width: 100%;"></video>
+      <button id="load-video-btn" class="load-new-btn">Load New Video</button>
+    </div>
+    <div class="transcript-section">
+      <div id="status-updates">
+         <!-- Status messages will appear here -->
+      </div>
+      <h2>Transcript</h2>
+      <div id="transcript-content" style="height: calc(100% - 50px); overflow-y: auto;">
+        <!-- Transcript will appear here -->
+        <p>Please load a video to begin.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="./renderer.js"></script>
+</body>
+</html> 

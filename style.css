@@ -1,0 +1,75 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  overflow: hidden; /* Prevent body scrolling */
+}
+
+.container {
+  display: flex;
+  height: 100vh; /* Full viewport height */
+}
+
+.video-section {
+  flex: 1; /* Takes up half the space */
+  padding: 20px;
+  border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column; /* Stack placeholder/video vertically */
+  justify-content: center; /* Center the button initially */
+  align-items: center;
+  background-color: #f0f0f0;
+}
+
+.transcript-section {
+  flex: 1; /* Takes up the other half */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent this section from scrolling independently */
+}
+
+#video-placeholder {
+  text-align: center;
+}
+
+#load-video-btn {
+  padding: 15px 30px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#load-video-btn:hover {
+  background-color: #0056b3;
+}
+
+#status-updates {
+    max-height: 100px; /* Limit status height */
+    overflow-y: auto;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+#transcript-content {
+    flex-grow: 1; /* Takes remaining space */
+    overflow-y: auto; /* Allow transcript content to scroll */
+    line-height: 1.6;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Style for highlighted words (add later) */
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+} 
