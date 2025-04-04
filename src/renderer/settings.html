@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>API Key Setup</title>
     <!-- Basic Styling -->
+    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
     <style>
         body {
             font-family: sans-serif;
@@ -40,11 +42,10 @@
             margin-bottom: 10px;
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
 </head>
 <body>
     <h2>OpenAI API Key Setup</h2>
-    <p>Please enter your OpenAI API Key to enable transcription and translation. You can obtain a key from <a href="#" id="openai-link">platform.openai.com</a>.</p>
+    <p>Get your API key from <a href="#" id="openai-link">OpenAI</a>.</p>
     
     <label for="api-key">API Key:</label>
     <input type="text" id="api-key" placeholder="Enter your OpenAI API Key (sk-...)">

@@ -2,7 +2,7 @@
   "name": "video-transcriber",
   "version": "1.0.0",
   "description": "Transcribe and translate videos using OpenAI Whisper.",
-  "main": "main.js",
+  "main": "src/main/index.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
@@ -31,13 +31,7 @@
     "appId": "com.yourapp.videotranscriber",
     "productName": "Video Transcriber",
     "files": [
-      "main.js",
-      "preload.js",
-      "index.html",
-      "renderer.js",
-      "style.css",
-      "settings.html",
-      "settings-renderer.js",
+      "src/**/*",
       "node_modules/**/*",
       "package.json"
     ],
