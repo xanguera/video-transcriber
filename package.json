@@ -1,74 +1,101 @@
 {
   "name": "video-transcriber",
   "version": "1.0.0",
-  "description": "Transcribe and translate videos using OpenAI Whisper.",
-  "main": "src/main/index.js",
+  "description": "A simple Electron application to transcribe and translate video files using OpenAI's Whisper API.",
+  "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm run build-ytdlp && electron-builder",
+    "setup-icons": "node scripts/convert-icons.js",
+    "download-yt-dlp": "node scripts/download-yt-dlp.js",
+    "build-ytdlp": "node scripts/build-ytdlp.js",
+    "postinstall": "npm run build-ytdlp",
+    "verify-build": "node scripts/verify-build.js",
+    "test-packaged-ytdlp": "node scripts/test-packaged-ytdlp.js"
   },
-  "keywords": [
-    "Electron",
-    "Whisper",
-    "Transcription",
-    "Translation"
-  ],
-  "author": "Your Name or Company",
+  "author": "ELSA, Corp.",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.9.1"
+    "@electron/notarize": "^3.0.1",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.9.1",
+    "pkg": "^5.8.1"
   },
   "dependencies": {
-    "dotenv": "^16.0.0",
-    "fluent-ffmpeg": "^2.1.2",
-    "ffmpeg-static": "^5.0.0",
-    "openai": "^4.0.0",
-    "electron-store": "^8.1.0"
+    "axios": "^1.9.0",
+    "electron-store": "^8.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "fluent-ffmpeg": "^2.1.3",
+    "openai": "^4.28.0"
   },
   "build": {
-    "appId": "com.yourapp.videotranscriber",
+    "appId": "com.elsa.videotranscriber",
     "productName": "Video Transcriber",
+    "directories": {
+      "buildResources": "build"
+    },
     "files": [
+      "main.js",
       "src/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "node_modules/**/*"
     ],
     "extraResources": [
-        {
-            "from": "node_modules/ffmpeg-static/", 
-            "to": "ffmpeg-static",
-            "filter": [
-                "**/*",
-                "!*.txt",
-                "!*.md"
-            ]
-        }
+      {
+        "from": "node_modules/ffmpeg-static/ffmpeg",
+        "to": "ffmpeg"
+      }
     ],
     "mac": {
-      "category": "public.app-category.video",
       "target": [
+        "dir",
+        "zip"
+      ],
+      "icon": "build/icons/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "identity": "ELSA, Corp. (DQ47627WZ6)",
+      "extraResources": [
         {
-          "target": "dir",
-          "arch": ["arm64"]
+          "from": "node_modules/ffmpeg-static/ffmpeg",
+          "to": "ffmpeg"
         },
         {
-          "target": "zip",
-          "arch": ["arm64"]
+          "from": "binaries/darwin-yt-dlp",
+          "to": "yt-dlp"
         }
-      ],
-      "icon": "build/icon.icns",
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false
+      ]
     },
     "win": {
-        "target": "nsis",
-        "icon": "build/icon.ico"
+      "target": "nsis",
+      "icon": "build/icons/icon.ico",
+      "extraResources": [
+        {
+          "from": "node_modules/ffmpeg-static/ffmpeg.exe",
+          "to": "ffmpeg.exe"
+        },
+        {
+          "from": "binaries/win32-yt-dlp.exe",
+          "to": "yt-dlp.exe"
+        }
+      ]
     },
     "linux": {
-        "target": "AppImage",
-        "icon": "build/icon.png"
-    }
+      "target": "AppImage",
+      "icon": "build/icons/icon.png",
+      "extraResources": [
+        {
+          "from": "node_modules/ffmpeg-static/ffmpeg",
+          "to": "ffmpeg"
+        },
+        {
+          "from": "binaries/linux-yt-dlp",
+          "to": "yt-dlp"
+        }
+      ]
+    },
+    "afterSign": "scripts/notarize.js"
   }
-} 
+}

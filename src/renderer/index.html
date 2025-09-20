@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Video Transcriber</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../../build/icons/icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../build/icons/icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../build/icons/icon.png">
   <link rel="stylesheet" href="style.css">
   <!-- Recommended Electron security Content-Security-Policy -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' blob:;">
@@ -10,21 +13,106 @@
 <body>
   <div class="container">
     <div class="video-section">
+      <!-- Move button group to top of video section -->
+      <div class="button-group">
+        <div class="dropdown">
+          <button id="load-video-btn" class="load-btn-main">Load Local Video</button>
+          <button id="dropdown-toggle" class="dropdown-toggle">▼</button>
+          <div id="dropdown-menu" class="dropdown-menu">
+            <button id="load-local-btn" class="dropdown-item">📁 Load Local Video</button>
+            <button id="download-youtube-btn" class="dropdown-item">🎥 Download from YouTube</button>
+            <button id="download-gdrive-btn" class="dropdown-item">☁️ Download from Google Drive</button>
+            <button id="browse-downloads-btn" class="dropdown-item">📂 Browse Downloaded Videos</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Progress indicator (initially hidden) -->
+      <div id="download-progress" class="download-progress" style="display: none;">
+        <div class="progress-bar">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <div id="progress-text" class="progress-text">Preparing download...</div>
+      </div>
+      
       <div id="video-placeholder">
         <p>Select a video file to load.</p>
       </div>
       <video id="video-player" controls style="display: none; width: 100%;"></video>
-      <button id="load-video-btn" class="load-new-btn">Load New Video</button>
     </div>
     <div class="transcript-section">
       <div id="status-updates">
          <!-- Status messages will appear here -->
       </div>
       <h2>Transcript</h2>
-      <div id="transcript-content" style="height: calc(100% - 50px); overflow-y: auto;">
+      <div id="transcript-content" style="height: calc(100% - 100px); overflow-y: auto;">
         <!-- Transcript will appear here -->
         <p>Please load a video to begin.</p>
       </div>
+      
+      <!-- Recompute transcript button -->
+      <div class="transcript-actions">
+        <button id="recompute-transcript-btn" class="recompute-btn" style="display: none;" title="Recompute transcript from audio">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+          </svg>
+          Recompute Transcript
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- URL Input Modal -->
+  <div id="url-input-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <h3 id="modal-title">Enter URL</h3>
+      <p id="modal-description">Please enter the video URL:</p>
+      <input type="url" id="url-input" placeholder="Enter URL here..." />
+      <div class="url-validation" id="url-validation"></div>
+      <div class="modal-buttons">
+        <button id="cancel-url-btn" class="btn-secondary">Cancel</button>
+        <button id="download-url-btn" class="btn-primary" disabled>Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download History Modal -->
+  <div id="history-modal" class="modal" style="display: none;">
+    <div class="modal-content history-modal">
+      <span id="close-history-modal" class="close">&times;</span>
+      <h3>Downloaded Videos</h3>
+      <div id="storage-info" class="storage-info"></div>
+      <div id="download-list" class="download-list">
+        <!-- Download history items will appear here -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Console Panel Toggle Button -->
+  <div id="console-toggle" class="console-toggle">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4 17 10 11 4 5"></polyline>
+      <line x1="12" y1="19" x2="20" y2="19"></line>
+    </svg>
+  </div>
+  
+  <!-- Console Panel -->
+  <div id="console-panel" class="console-panel">
+    <div class="console-header">
+      <h3>Console Output</h3>
+      <div class="console-actions">
+        <button id="test-ytdlp-btn" class="console-btn" title="Test yt-dlp setup">Test yt-dlp</button>
+        <button id="test-system-ytdlp-btn" class="console-btn" title="Test system yt-dlp installation">Test System yt-dlp</button>
+        <button id="debug-info-btn" class="console-btn" title="Show debug information">Debug Info</button>
+        <button id="console-close" class="console-close">&times;</button>
+      </div>
+    </div>
+    <div id="console-content" class="console-content">
+      <!-- Console logs will appear here -->
     </div>
   </div>
 

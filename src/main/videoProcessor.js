@@ -3,10 +3,11 @@ const fs = require('fs');
 const { app, dialog } = require('electron'); // Need app for path, dialog for errors
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegStatic = require('ffmpeg-static');
+const transcriptManager = require('./transcriptManager');
 
 // Determine ffmpeg path (packaged vs development)
 const ffmpegPath = app.isPackaged
-  ? path.join(process.resourcesPath, 'ffmpeg-static', process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg')
+  ? path.join(process.resourcesPath, 'ffmpeg')
   : require('ffmpeg-static');
 
 // Set the path for fluent-ffmpeg, handling potential errors
@@ -23,19 +24,61 @@ function setupFfmpeg() {
 }
 
 /**
+ * Determines if a video file is downloaded or local
+ * @param {string} videoPath - Path to the video file
+ * @returns {string} 'downloaded' or 'local'
+ */
+function determineVideoSource(videoPath) {
+    const downloadsBase = path.join(require('os').homedir(), 'VideoTranscriber', 'Downloads');
+    return videoPath.startsWith(downloadsBase) ? 'downloaded' : 'local';
+}
+
+/**
  * Processes the video file: extracts audio and sends it to OpenAI for translation.
+ * First checks for cached transcript, then processes if not found.
  * @param {string} videoPath - The path to the video file.
  * @param {object} openaiClient - The initialized OpenAI client instance.
  * @param {function(string): void} sendStatusUpdate - Callback function to send status messages to the renderer.
- * @returns {Promise<{text: string, segments: Array}>} - Promise resolving with transcription text and segments.
+ * @param {boolean} forceRecompute - Whether to force recomputation even if cached transcript exists.
+ * @returns {Promise<{text: string, segments: Array, cached?: boolean}>} - Promise resolving with transcription text and segments.
  */
-async function processVideo(videoPath, openaiClient, sendStatusUpdate) {
+async function processVideo(videoPath, openaiClient, sendStatusUpdate, forceRecompute = false) {
     if (!openaiClient) {
         sendStatusUpdate('Error: OpenAI client is not available in video processor.');
         throw new Error('OpenAI client not provided to video processor.');
     }
 
     console.log(`Processing video: ${videoPath}`);
+    const videoSource = determineVideoSource(videoPath);
+    
+    // Check for cached transcript unless forcing recompute
+    if (!forceRecompute) {
+        sendStatusUpdate('Checking for cached transcript...');
+        try {
+            let cachedTranscript = null;
+            
+            if (videoSource === 'downloaded') {
+                cachedTranscript = transcriptManager.loadDownloadedVideoTranscript(videoPath);
+            } else {
+                cachedTranscript = await transcriptManager.loadLocalVideoTranscript(videoPath);
+            }
+            
+            if (cachedTranscript) {
+                sendStatusUpdate('Using cached transcript.');
+                console.log('Using cached transcript for video:', videoPath);
+                return {
+                    text: cachedTranscript.text,
+                    segments: cachedTranscript.segments,
+                    cached: true,
+                    generatedAt: cachedTranscript.generatedAt
+                };
+            }
+        } catch (error) {
+            console.warn('Error checking cached transcript, proceeding with fresh processing:', error);
+        }
+    }
+
+    // No cached transcript found or forced recompute, proceed with processing
     const tempDir = app.getPath('temp');
     const audioFileName = `audio_${Date.now()}.mp3`;
     const audioOutputPath = path.join(tempDir, audioFileName);
@@ -94,10 +137,29 @@ async function processVideo(videoPath, openaiClient, sendStatusUpdate) {
             }
         }
 
-        sendStatusUpdate('Processing complete.');
-        return {
+        const transcriptData = {
             text: whisperResponse?.text || '',
             segments: whisperResponse?.segments || []
+        };
+
+        // Save transcript for future use
+        try {
+            sendStatusUpdate('Saving transcript...');
+            if (videoSource === 'downloaded') {
+                transcriptManager.saveDownloadedVideoTranscript(videoPath, transcriptData);
+            } else {
+                await transcriptManager.saveLocalVideoTranscript(videoPath, transcriptData);
+            }
+        } catch (saveError) {
+            console.warn('Failed to save transcript, but processing was successful:', saveError);
+            // Don't throw error here as the main processing was successful
+        }
+
+        sendStatusUpdate('Processing complete.');
+        return {
+            text: transcriptData.text,
+            segments: transcriptData.segments,
+            cached: false
         };
 
     } catch (error) {

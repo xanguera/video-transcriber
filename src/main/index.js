@@ -10,19 +10,23 @@ const windowManager = require('./windowManager');
 const configManager = require('./configManager');
 const videoProcessor = require('./videoProcessor'); // Import video processor
 const ipcHandlers = require('./ipcHandlers'); // Import IPC handlers module
+const downloadManager = require('./downloadManager'); // Import download manager
 
 // Initialize config manager
 configManager.initializeClientFromStore();
 
 // Setup ffmpeg path via videoProcessor
-videoProcessor.setupFfmpeg(); 
+videoProcessor.setupFfmpeg();
+
+// Initialize download directories
+downloadManager.ensureDownloadsDirectoryExists();
+
+// Setup IPC handlers
+ipcHandlers.setupIpcHandlers();
 
 // --- App Lifecycle Handlers --- 
 
 app.whenReady().then(() => {
-  // Setup IPC handlers BEFORE creating the window
-  ipcHandlers.setupIpcHandlers(); 
-  
   // Create main window
   windowManager.createMainWindow(() => {
     if (!configManager.getOpenAIClient()) { 

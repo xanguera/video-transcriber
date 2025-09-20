@@ -144,4 +144,11 @@ out/
 
 # Temp files
 temp/
-*.tmp 
+*.tmp
+
+# Downloaded binaries (auto-downloaded during npm install)
+binaries/*
+!binaries/.gitkeep
+
+# Build temporary directory for yt-dlp compilation
+build-temp/ 

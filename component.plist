@@ -10,9 +10,9 @@
         <key>RootRelativeBundlePath</key>
         <string>Video Transcriber.app</string>
         <key>BundleIdentifier</key>
-        <string>com.yourapp.videotranscriber</string> <!-- Use your actual app ID -->
+        <string>com.elsa.videotranscriber</string>
         <key>BundleVersion</key>
-        <string>1.0.0</string> <!-- Use your actual app version -->
+        <string>1.0.0</string>
     </dict>
 </array>
 </plist> 

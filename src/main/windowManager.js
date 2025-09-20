@@ -8,6 +8,7 @@ function createMainWindow(promptForApiKeyIfNeeded) {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+    icon: path.join(__dirname, '../../build/icons/icon.png'), // Add custom icon
     webPreferences: {
       preload: path.join(__dirname, '../preload/mainPreload.js'), // Updated path
       contextIsolation: true,
@@ -43,6 +44,7 @@ function promptForApiKey() {
     width: 500,
     height: 300,
     title: 'API Key Setup',
+    icon: path.join(__dirname, '../../build/icons/icon.png'), // Add custom icon
     parent: mainWindow, // Make it a modal window relative to the main window
     modal: true,
     resizable: false,
